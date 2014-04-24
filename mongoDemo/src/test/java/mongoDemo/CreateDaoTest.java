@@ -18,9 +18,8 @@ import com.googlecode.mjorm.MongoDao;
 import com.googlecode.mjorm.query.DaoQuery;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
-import com.mongodb.DBCursor;
 
-public class UserDaoTest {
+public class CreateDaoTest {
 	protected DBCollection collection;
 	protected MongoDao mDao;
 	protected DaoQuery query;
@@ -52,7 +51,6 @@ public class UserDaoTest {
 		query.eq("stateId", "12345");
 		query.eq("name", "GoDaddy");
 		Company c = query.findObject(Company.class);
-		// System.out.println(c.toString());
 		assertEquals(c.getStateId(), aCompany.getStateId());
 		assertEquals(c.getName(), aCompany.getName());
 		assertEquals(new ArrayList<Document>(), c.getDocuments());
@@ -99,13 +97,36 @@ public class UserDaoTest {
 		User user = mongoTestHelper.makeUser();
 		mDao.createObject("sampleUser", user);
 		DaoQuery query;
-		for (Company company : user.getCompanies()) {
-		    query = mDao.createQuery();
-			query.setCollection("sampleUser");
-			query.eq("name",company.getName());
-			DBCursor c = query.findObjects("Company");
-			System.out.println(c.length());
-			assertNotNull(c);
+
+		query = mDao.createQuery();
+		query.setCollection("sampleUser");
+		User c = query.findObject(User.class);
+		assertNotNull(c.getCompanies());
+
+		for (int x = 0; x < c.getCompanies().size(); x++) {
+			// Not only do they all exist, they're even in order!
+			assertEquals(c.getCompanies().get(x).getName(), user.getCompanies()
+					.get(x).getName());
 		}
 	}
+
+	@Test
+	public void testDocumentSubComponent() {
+		User user = mongoTestHelper.makeUser();
+		mDao.createObject("sampleUser", user);
+		DaoQuery query;
+
+		query = mDao.createQuery();
+		query.setCollection("sampleUser");
+		User c = query.findObject(User.class);
+		assertNotNull(c.getCompanies());
+
+		for (int x = 0; x < c.getCompanies().size(); x++) {
+			// Not only do they all exist, they're even in order!
+			assertNotNull(c.getCompanies().get(x).getDocuments());
+			assertEquals(c.getCompanies().get(x).getDocuments(), user
+					.getCompanies().get(x).getDocuments());
+		}
+	}
+	
 }

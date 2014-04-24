@@ -8,9 +8,17 @@ import org.junit.Test;
 
 public class DocumentObjectTest {
 	private final String description = "Description";
+	private final String id = "12345";
 	private Document document = new Document();
 	private Company company = new Company();
 
+	@Test
+	public void testGetAndSetDocId() {
+		document.setDocId(id);
+		String d = document.getDocId();
+		assertEquals(d, id);
+	}
+	
 	@Test
 	public void testGetAndSetDescription() {
 		document.setDescription(description);
